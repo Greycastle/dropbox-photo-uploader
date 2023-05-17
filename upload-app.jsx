@@ -68,16 +68,69 @@ function AppAuthentication({ children }) {
   return <div><button onClick={() => connect()}>Connect DropBox</button></div>
 }
 
-function App() {
+function logout() {
+  localStorage.removeItem('photo_uploader_token')
+  window.location = window.location.origin
+}
 
-  const logout = () => {
-    localStorage.removeItem('photo_uploader_token')
-    window.location = window.location.origin
+async function loadImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      resolve(reader.result)
+    };
+
+    reader.readAsDataURL(file);
+  })
+}
+
+function UploadInterface() {
+  const [ images, setImages ] = React.useState([])
+
+  const handleFiles = async (event) => {
+    const files = event.target.files;
+    const newImages = await Promise.all(Array.from(files).map(loadImage))
+    setImages([ ...images, ...newImages ])
   }
 
+  return <div className="w-100" style={ { 'maxWidth': '920px' } }>
+    <header className="d-flex justify-content-between mb-4">
+      <span>Upload photos</span>
+      <span onClick={() => logout()}>Logout</span>
+    </header>
+    <div>
+      <form className="d-flex row" style={{ 'gap': '2rem'}}>
+        <div id="core-inputs" className="d-flex justify-content-between gap-4">
+          <label>
+            <span>Date</span>
+            <input type="date" />
+          </label>
+          <label>
+            <span>First name</span>
+            <input type="text" />
+          </label>
+          <label>
+            <span>Last name</span>
+            <input type="text" />
+          </label>
+        </div>
+        <div id="upload">
+          <input type="file" accept="image/*" multiple onChange={handleFiles} />
+        </div>
+        <div id="image-previews">
+          { images.map((src, index) => <img key={index} src={src} />) }
+        </div>
+        <div>
+          <button>Save photos</button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+function App() {
   return <AppAuthentication>
-    <span>You are logged in!</span>
-    <button onClick={() => logout()}>Logout</button>
+    <UploadInterface />
   </AppAuthentication>
 }
 

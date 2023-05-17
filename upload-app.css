@@ -1,0 +1,12 @@
+#root {
+  padding: 2rem;
+}
+
+label > * {
+  display: block;
+}
+
+input {
+  border-radius: 0.2rem;
+  border: 1px solid gray;
+}
