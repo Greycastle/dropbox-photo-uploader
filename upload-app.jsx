@@ -84,6 +84,13 @@ async function loadImage(file) {
   })
 }
 
+function ImageCard({ src, index }) {
+  return <div className="card w-50 p-4">
+    <img src={src} />
+    <span>Image { index }</span>
+  </div>
+}
+
 function UploadInterface() {
   const [ images, setImages ] = React.useState([])
 
@@ -117,8 +124,8 @@ function UploadInterface() {
         <div id="upload">
           <input type="file" accept="image/*" multiple onChange={handleFiles} />
         </div>
-        <div id="image-previews">
-          { images.map((src, index) => <img key={index} src={src} />) }
+        <div id="image-previews" className="d-flex wrap gap-4">
+          { images.map((src, index) => <ImageCard key={index} index={index} src={src} />) }
         </div>
         <div>
           <button>Save photos</button>
