@@ -1,4 +1,4 @@
-const rawRedirectUri = window.location.origin + '/?authenticated=true';
+const rawRedirectUri = window.location.origin + window.location.pathname + '/?authenticated=true';
 
 async function getClientToken(code) {
   const requestData = new URLSearchParams()
