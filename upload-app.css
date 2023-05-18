@@ -18,6 +18,8 @@ label > * {
 input {
   border-radius: 0.2rem;
   border: 1px solid gray;
+  font-size: 1.25rem;
+  padding: 0.25rem;
 }
 
 .file-upload input[type="file"] {
@@ -27,8 +29,32 @@ input {
 .file-upload {
   border: 1px solid gray;
   background-color: lightgray;
+  border-radius: var(--bs-border-radius);
+}
+
+button {
+  border: 1px solid #007bff;
+  border-radius: 0.5rem;
+  padding: 0.25rem 2rem;
+  background-color: #007bff;
+  color: white;
+  transition: all 0.1s ease-in-out;
+}
+
+button:hover {
+  background-color: white;
+  color: #007bff;
 }
 
 .file-upload, .file-upload * {
   cursor: pointer;
+}
+
+.text-danger {
+  font-size: 0.75rem;
+  color: red;
+}
+
+label {
+  font-size: 0.9rem;
 }

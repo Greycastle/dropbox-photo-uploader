@@ -1,5 +1,7 @@
 const rawRedirectUri = window.location.origin + window.location.pathname + '?authenticated=true';
 
+const nameLengthLimit = 120;
+
 const FormContext = React.createContext({})
 
 function FormContextProvider({ children }) {
@@ -98,12 +100,15 @@ function AppAuthentication({ children }) {
     const redirectUri = encodeURIComponent(rawRedirectUri);
     const clientId = '4l2igbdm2itulbo';
     const url = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
-    console.log(`url`, url)
-    console.log('redirectUrl', rawRedirectUri)
     window.location = url;
   }
 
-  return <div className="d-flex justify-content-center"><button onClick={() => connect()}>Connect DropBox</button></div>
+  return <div className="d-flex justify-content-center">
+    <div className="mt-4 d-flex justify-content-center flex-column">
+      <h1 className="mb-4">Photo uploader</h1>
+      <button onClick={() => connect()}>Connect DropBox</button>
+    </div>
+  </div>
 }
 
 function logout() {
@@ -147,14 +152,20 @@ function ImageCard({ src, index, onRemove }) {
     formState.setImagePurpose({ ...formState.imagePurpose, [index]: purpose })
   }, [ index, formState.imagePurpose ])
 
-  return <div className="card w-100 p-1 d-flex flex-row column-gap-2">
-    <img src={src} style={{ maxWidth: '20rem' }} />
-    <div className="d-flex flex-column row-gap-2">
+  const lengthExceeded = filename.length > nameLengthLimit
+
+  return <div className="card w-100 p-1 d-flex flex-row">
+    <img src={src} style={{ maxWidth: '20rem', objectFit: 'contain', borderRadius: 'var(--bs-card-border-radius)' }} />
+    <div className="d-flex flex-column row-gap-2 flex-grow-1 mx-2" style={{ overflow: 'hidden' }}>
       <label className="w-100">
         Purpose
         <input className="w-100" name="purpose" autoComplete="on" type="text" value={formState.imagePurpose[index] ?? ''} onChange={(e) => setPurpose(e.target.value)} />
+        { lengthExceeded && <span className="text-danger">Filename too long, reduce the length of the name or the purpose</span> }
       </label>
-      <span>Final filename: { filename } </span>
+      <div>
+        <label>Final filename:</label><br/>
+        <span>{ filename }</span>
+      </div>
       <a className="mt-4" href="#" onClick={() => onRemove(index)}>Remove</a>
     </div>
   </div>
@@ -257,7 +268,7 @@ function UploadInterface() {
 
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
     <header className="d-flex justify-content-between mb-4">
-      <span className="title">Photo upload</span>
+      <span className="title">Photo uploader</span>
       <a href="#" onClick={() => logout()}>Logout</a>
     </header>
     { uploadState === 'pending' && <div>
