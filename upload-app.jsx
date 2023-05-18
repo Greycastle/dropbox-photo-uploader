@@ -147,15 +147,15 @@ function ImageCard({ src, index, onRemove }) {
     formState.setImagePurpose({ ...formState.imagePurpose, [index]: purpose })
   }, [ index, formState.imagePurpose ])
 
-  return <div className="card w-50 p-4 d-flex">
-    <img src={src} />
-    <div className="d-flex row">
-      <label>
+  return <div className="card w-100 p-1 d-flex flex-row column-gap-2">
+    <img src={src} style={{ maxWidth: '20rem' }} />
+    <div className="d-flex flex-column row-gap-2">
+      <label className="w-100">
         Purpose
-        <input name="purpose" autoComplete="on" type="text" value={formState.imagePurpose[index] ?? ''} onChange={(e) => setPurpose(e.target.value)} />
+        <input className="w-100" name="purpose" autoComplete="on" type="text" value={formState.imagePurpose[index] ?? ''} onChange={(e) => setPurpose(e.target.value)} />
       </label>
       <span>Final filename: { filename } </span>
-      <a href="#" onClick={() => onRemove(index)}>Remove</a>
+      <a className="mt-4" href="#" onClick={() => onRemove(index)}>Remove</a>
     </div>
   </div>
 }
@@ -261,26 +261,26 @@ function UploadInterface() {
       <a href="#" onClick={() => logout()}>Logout</a>
     </header>
     { uploadState === 'pending' && <div>
-      <form className="d-flex row" style={{ 'gap': '2rem'}}>
-        <div id="core-inputs" className="d-flex justify-content-between gap-4">
-          <label>
+      <form className="d-flex flex-column row-gap-4">
+        <div id="core-inputs" className="d-flex w-100 justify-content-between column-gap-4">
+          <label className="flex-grow-1">
             <span>Date</span>
-            <input type="date" value={formState.date} onChange={(e) => formState.setDate(e.target.value)} />
+            <input className="w-100" type="date" value={formState.date} onChange={(e) => formState.setDate(e.target.value)} />
           </label>
-          <label>
+          <label className="flex-grow-1">
             <span>First name</span>
-            <input type="text" autoComplete="off" value={formState.firstName} onChange={(e) => formState.setFirstName(e.target.value)} />
+            <input className="w-100" type="text" autoComplete="off" value={formState.firstName} onChange={(e) => formState.setFirstName(e.target.value)} />
           </label>
-          <label>
+          <label className="flex-grow-1">
             <span>Last name</span>
-            <input type="text" autoComplete="off" value={formState.lastName} onChange={(e) => formState.setLastName(e.target.value)} />
+            <input className="w-100" type="text" autoComplete="off" value={formState.lastName} onChange={(e) => formState.setLastName(e.target.value)} />
           </label>
         </div>
-        <div className="file-upload mx-2 p-4" onClick={(e) => fileButton.current.click(e)}>
+        <div className="file-upload p-4" onClick={(e) => fileButton.current.click(e)}>
           <span>Click to select files</span>
           <input ref={fileButton} id="file-upload" type="file" accept="image/*" multiple onChange={handleFiles} />
         </div>
-        <div id="image-previews" className="d-flex flex-wrap gap-4">
+        <div id="image-previews" className="d-flex flex-column row-gap-4">
           { images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />) }
         </div>
         <div>
