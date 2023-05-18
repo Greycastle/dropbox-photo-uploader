@@ -228,7 +228,7 @@ async function uploadFiles(folderName, images, formState) {
 
 function UploadInterface() {
   const [ images, setImages ] = React.useState([])
-  const [ isUploading, setIsUploading ] = React.useState(false)
+  const [ uploadState, setUploadState ] = React.useState('pending')
 
   const handleFiles = async (event) => {
     const files = event.target.files;
@@ -245,13 +245,13 @@ function UploadInterface() {
   const formState = React.useContext(FormContext)
 
   const upload = React.useCallback(async () => {
-    setIsUploading(true)
+    setUploadState('uploading')
     const folderName = `${capitalize(formState.firstName)}${capitalize(formState.lastName)}`
     await createFolder(folderName)
     await uploadFiles(folderName, images, formState)
     setImages([])
     formState.reset()
-    setIsUploading(false)
+    setUploadState('success')
   }, [ formState, images ])
 
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
@@ -259,7 +259,7 @@ function UploadInterface() {
       <span>Upload photos</span>
       <a href="#" onClick={() => logout()}>Logout</a>
     </header>
-    { !isUploading && <div>
+    { uploadState === 'pending' && <div>
       <form className="d-flex row" style={{ 'gap': '2rem'}}>
         <div id="core-inputs" className="d-flex justify-content-between gap-4">
           <label>
@@ -286,7 +286,11 @@ function UploadInterface() {
         </div>
       </form>
     </div> }
-    { isUploading && <div>Uploading..</div>}
+    { uploadState === 'uploading' && <div>Uploading..</div>}
+    { uploadState === 'success' && <div>
+      <p>Upload completed!</p>
+      <button onClick={() => setUploadState('pending')}>Continue</button>
+      </div>}
   </div>
 }
 
