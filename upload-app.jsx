@@ -148,13 +148,7 @@ function ImageCard({ src, index, onRemove }) {
 }
 
 function UploadInterface() {
-  const [ images, setImages ] = React.useState(JSON.parse(localStorage.getItem('images') ?? '[]'))
-
-  React.useEffect(() => {
-    if (images && images.length > 0) {
-      localStorage.setItem('images', JSON.stringify(images))
-    }
-  }, [images])
+  const [ images, setImages ] = React.useState([])
 
   const handleFiles = async (event) => {
     const files = event.target.files;
