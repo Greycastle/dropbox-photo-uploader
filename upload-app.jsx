@@ -220,6 +220,7 @@ async function uploadFiles(folderName, images, formState) {
 
 function UploadInterface() {
   const [ images, setImages ] = React.useState([])
+  const [ isUploading, setIsUploading ] = React.useState(false)
 
   const handleFiles = async (event) => {
     const files = event.target.files;
@@ -236,9 +237,11 @@ function UploadInterface() {
   const formState = React.useContext(FormContext)
 
   const upload = React.useCallback(async () => {
+    setIsUploading(true)
     const folderName = `${capitalize(formState.firstName)}${capitalize(formState.lastName)}`
     await createFolder(folderName)
     await uploadFiles(folderName, images, formState)
+    setIsUploading(false)
   }, [ formState, images ])
 
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
@@ -246,7 +249,7 @@ function UploadInterface() {
       <span>Upload photos</span>
       <a href="#" onClick={() => logout()}>Logout</a>
     </header>
-    <div>
+    { !isUploading && <div>
       <form className="d-flex row" style={{ 'gap': '2rem'}}>
         <div id="core-inputs" className="d-flex justify-content-between gap-4">
           <label>
@@ -272,7 +275,8 @@ function UploadInterface() {
           <button onClick={(e) => { e.preventDefault(); upload(); }}>Save photos</button>
         </div>
       </form>
-    </div>
+    </div> }
+    { isUploading && <div>Uploading..</div>}
   </div>
 }
 
