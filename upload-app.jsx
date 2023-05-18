@@ -4,8 +4,15 @@ const nameLengthLimit = 120;
 
 const FormContext = React.createContext({})
 
+function getTodaysDate() {
+  var local = new Date();
+  local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
+  return local.toJSON().slice(0,10);
+}
+
+const today = new Date().toDat
 function FormContextProvider({ children }) {
-  const [ date, setDate ] = React.useState(localStorage.getItem('form_date') ?? '')
+  const [ date, setDate ] = React.useState(localStorage.getItem('form_date') ?? getTodaysDate())
   const [ firstName, setFirstName ] = React.useState(localStorage.getItem('form_firstName') ?? '')
   const [ lastName, setLastName ] = React.useState(localStorage.getItem('form_lastName') ?? '')
   const [ imagePurpose, setImagePurpose ] = React.useState({})
@@ -18,7 +25,7 @@ function FormContextProvider({ children }) {
 
   const reset = () => {
     setImagePurpose({})
-    setDate('')
+    setDate(getTodaysDate())
     setFirstName('')
     setLastName('')
   }
@@ -269,7 +276,10 @@ function UploadInterface() {
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
     <header className="d-flex justify-content-between mb-4">
       <span className="title">Photo uploader</span>
-      <a href="#" onClick={() => logout()}>Logout</a>
+      <div className="d-flex flex-row column-gap-4">
+        <a href="#" onClick={() => formState.reset()}>Reset form</a>
+        <a href="#" onClick={() => logout()}>Logout</a>
+      </div>
     </header>
     { uploadState === 'pending' && <div>
       <form className="d-flex flex-column row-gap-4">

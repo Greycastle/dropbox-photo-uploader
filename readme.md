@@ -1,5 +1,8 @@
 # DropBox Photo Uploader
 
+This application is built using standalone (no-build) ReactJS and can be hosted as plain Javascript files. It uses a Dropbox application to authenticate to your Dropbox account and simplifies file naming when uploading multiple dated images.
+
+![Example usage](./app_usage.gif)
 
 ## Live demo
 
