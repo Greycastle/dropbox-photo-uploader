@@ -1,13 +1,12 @@
 const rawRedirectUri = window.location.origin + window.location.pathname + '?authenticated=true';
 
-console.log(`rawRedirectUri`, rawRedirectUri)
-
 const FormContext = React.createContext({})
 
 function FormContextProvider({ children }) {
   const [ date, setDate ] = React.useState(localStorage.getItem('form_date') ?? '')
   const [ firstName, setFirstName ] = React.useState(localStorage.getItem('form_firstName') ?? '')
   const [ lastName, setLastName ] = React.useState(localStorage.getItem('form_lastName') ?? '')
+  const [ imagePurpose, setImagePurpose ] = React.useState({})
 
   React.useEffect(() => {
     localStorage.setItem('form_date', date)
@@ -21,7 +20,9 @@ function FormContextProvider({ children }) {
     lastName,
     setDate,
     setFirstName,
-    setLastName
+    setLastName,
+    imagePurpose,
+    setImagePurpose
   }
 
   return <FormContext.Provider value={state}>
@@ -125,21 +126,25 @@ function getFilename(index, purpose, firstName, lastName, date) {
 }
 
 function ImageCard({ src, index, onRemove }) {
-  const [ purpose, setPurpose ] = React.useState('')
   const [ filename, setFilename ] = React.useState('')
 
   const formState = React.useContext(FormContext)
 
   React.useEffect(() => {
+    const purpose = formState.imagePurpose[index] ?? ''
     setFilename(getFilename(index + 1, purpose, formState.firstName, formState.lastName, formState.date))
-  }, [ formState.date, formState.firstName, formState.lastName, purpose ])
+  }, [ formState ])
+
+  const setPurpose = React.useCallback((purpose) => {
+    formState.setImagePurpose({ ...formState.imagePurpose, [index]: purpose })
+  }, [ index, formState.imagePurpose ])
 
   return <div className="card w-50 p-4 d-flex">
     <img src={src} />
     <div className="d-flex row">
       <label>
         Purpose
-        <input name="purpose" autoComplete="on" type="text" value={purpose} onChange={(e) => setPurpose(e.target.value)} />
+        <input name="purpose" autoComplete="on" type="text" value={formState.imagePurpose[index] ?? ''} onChange={(e) => setPurpose(e.target.value)} />
       </label>
       <span>Final filename: { filename } </span>
       <a href="#" onClick={() => onRemove(index)}>Remove</a>
@@ -204,7 +209,8 @@ async function uploadFile(path, dataUrl) {
 async function uploadFiles(folderName, images, formState) {
   console.log(`Uploading ${images.length} images..`)
   const tasks = images.map((image, index) => {
-    const filename = getFilename(index + 1, 'purpose', formState.firstName, formState.lastName, formState.date)
+    const purpose = formState.imagePurpose[index] ?? '_'
+    const filename = getFilename(index + 1, purpose, formState.firstName, formState.lastName, formState.date)
     const path = `/${folderName}/${filename}`
     return uploadFile(path, image)
   })
