@@ -2,6 +2,15 @@
   padding: 2rem;
 }
 
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+header {
+  border-bottom: 1px solid gray;
+}
+
 label > * {
   display: block;
 }
@@ -9,4 +18,17 @@ label > * {
 input {
   border-radius: 0.2rem;
   border: 1px solid gray;
+}
+
+.file-upload input[type="file"] {
+  display: none;
+}
+
+.file-upload {
+  border: 1px solid gray;
+  background-color: lightgray;
+}
+
+.file-upload, .file-upload * {
+  cursor: pointer;
 }

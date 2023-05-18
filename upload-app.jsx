@@ -229,6 +229,7 @@ async function uploadFiles(folderName, images, formState) {
 function UploadInterface() {
   const [ images, setImages ] = React.useState([])
   const [ uploadState, setUploadState ] = React.useState('pending')
+  const fileButton = React.useRef(null)
 
   const handleFiles = async (event) => {
     const files = event.target.files;
@@ -256,7 +257,7 @@ function UploadInterface() {
 
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
     <header className="d-flex justify-content-between mb-4">
-      <span>Upload photos</span>
+      <span className="title">Photo upload</span>
       <a href="#" onClick={() => logout()}>Logout</a>
     </header>
     { uploadState === 'pending' && <div>
@@ -275,8 +276,9 @@ function UploadInterface() {
             <input type="text" autoComplete="off" value={formState.lastName} onChange={(e) => formState.setLastName(e.target.value)} />
           </label>
         </div>
-        <div id="upload">
-          <input type="file" accept="image/*" multiple onChange={handleFiles} />
+        <div className="file-upload mx-2 p-4" onClick={(e) => fileButton.current.click(e)}>
+          <span>Click to select files</span>
+          <input ref={fileButton} id="file-upload" type="file" accept="image/*" multiple onChange={handleFiles} />
         </div>
         <div id="image-previews" className="d-flex flex-wrap gap-4">
           { images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />) }
