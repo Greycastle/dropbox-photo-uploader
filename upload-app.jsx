@@ -147,6 +147,71 @@ function ImageCard({ src, index, onRemove }) {
   </div>
 }
 
+async function createFolder(name) {
+  const response = await fetch('https://api.dropboxapi.com/2/files/create_folder_v2', {
+    headers: {
+      'authorization': `Bearer ${getToken()}`,
+      'content-type': 'application/json'
+    },
+    method: 'POST',
+    body: JSON.stringify({
+      path: '/' + name,
+      autorename: false
+    })
+  })
+
+  if (response.status === 200) {
+    return
+  }
+
+  if (response.status === 409) {
+    console.log('Folder already exists')
+    return
+  }
+
+  const data = await response.json()
+  console.log(`Failed to create folder ${response.status}`, data)
+}
+
+async function convertDataUrlToOctetStream(dataUrl) {
+  const response = await fetch(dataUrl);
+  return await response.blob();
+}
+
+async function uploadFile(path, dataUrl) {
+  const data = await convertDataUrlToOctetStream(dataUrl)
+  const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+    headers: {
+      'authorization': `Bearer ${getToken()}`,
+      'Content-Type': 'application/octet-stream',
+      'Dropbox-API-Arg': JSON.stringify({ path, autorename: false })
+    },
+    method: 'POST',
+    body: data
+  })
+
+  if (response.status === 200) {
+    return
+  }
+  if (response.status === 409) {
+    console.log('File already exists: ' + path)
+    return
+  }
+  const responseJson = await response.json()
+  console.error(`Failed to upload: ${path}`, responseJson)
+}
+
+async function uploadFiles(folderName, images, formState) {
+  console.log(`Uploading ${images.length} images..`)
+  const tasks = images.map((image, index) => {
+    const filename = getFilename(index + 1, 'purpose', formState.firstName, formState.lastName, formState.date)
+    const path = `/${folderName}/${filename}`
+    return uploadFile(path, image)
+  })
+  await Promise.all(tasks)
+  console.log(`Upload completed!`)
+}
+
 function UploadInterface() {
   const [ images, setImages ] = React.useState([])
 
@@ -163,6 +228,12 @@ function UploadInterface() {
   }, [images])
 
   const formState = React.useContext(FormContext)
+
+  const upload = React.useCallback(async () => {
+    const folderName = `${capitalize(formState.firstName)}${capitalize(formState.lastName)}`
+    await createFolder(folderName)
+    await uploadFiles(folderName, images, formState)
+  }, [ formState, images ])
 
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
     <header className="d-flex justify-content-between mb-4">
@@ -188,11 +259,11 @@ function UploadInterface() {
         <div id="upload">
           <input type="file" accept="image/*" multiple onChange={handleFiles} />
         </div>
-        <div id="image-previews" className="d-flex wrap gap-4">
+        <div id="image-previews" className="d-flex flex-wrap gap-4">
           { images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />) }
         </div>
         <div>
-          <button>Save photos</button>
+          <button onClick={(e) => { e.preventDefault(); upload(); }}>Save photos</button>
         </div>
       </form>
     </div>
