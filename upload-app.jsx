@@ -14,6 +14,13 @@ function FormContextProvider({ children }) {
     localStorage.setItem('form_lastName', lastName)
   }, [ date, firstName, lastName ])
 
+  const reset = () => {
+    setImagePurpose({})
+    setDate('')
+    setFirstName('')
+    setLastName('')
+  }
+
   const state = {
     date,
     firstName,
@@ -22,7 +29,8 @@ function FormContextProvider({ children }) {
     setFirstName,
     setLastName,
     imagePurpose,
-    setImagePurpose
+    setImagePurpose,
+    reset
   }
 
   return <FormContext.Provider value={state}>
@@ -241,6 +249,8 @@ function UploadInterface() {
     const folderName = `${capitalize(formState.firstName)}${capitalize(formState.lastName)}`
     await createFolder(folderName)
     await uploadFiles(folderName, images, formState)
+    setImages([])
+    formState.reset()
     setIsUploading(false)
   }, [ formState, images ])
 
