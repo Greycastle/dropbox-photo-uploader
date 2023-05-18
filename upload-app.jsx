@@ -1,4 +1,33 @@
-const rawRedirectUri = window.location.origin + window.location.pathname + '/?authenticated=true';
+const rawRedirectUri = window.location.origin + window.location.pathname + '?authenticated=true';
+
+console.log(`rawRedirectUri`, rawRedirectUri)
+
+const FormContext = React.createContext({})
+
+function FormContextProvider({ children }) {
+  const [ date, setDate ] = React.useState(localStorage.getItem('form_date') ?? '')
+  const [ firstName, setFirstName ] = React.useState(localStorage.getItem('form_firstName') ?? '')
+  const [ lastName, setLastName ] = React.useState(localStorage.getItem('form_lastName') ?? '')
+
+  React.useEffect(() => {
+    localStorage.setItem('form_date', date)
+    localStorage.setItem('form_firstName', firstName)
+    localStorage.setItem('form_lastName', lastName)
+  }, [ date, firstName, lastName ])
+
+  const state = {
+    date,
+    firstName,
+    lastName,
+    setDate,
+    setFirstName,
+    setLastName
+  }
+
+  return <FormContext.Provider value={state}>
+    { children }
+  </FormContext.Provider>
+}
 
 async function getClientToken(code) {
   const requestData = new URLSearchParams()
@@ -65,7 +94,7 @@ function AppAuthentication({ children }) {
     window.location = url;
   }
 
-  return <div><button onClick={() => connect()}>Connect DropBox</button></div>
+  return <div className="d-flex justify-content-center"><button onClick={() => connect()}>Connect DropBox</button></div>
 }
 
 function logout() {
@@ -84,15 +113,48 @@ async function loadImage(file) {
   })
 }
 
-function ImageCard({ src, index }) {
-  return <div className="card w-50 p-4">
+function capitalize(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function getFilename(index, purpose, firstName, lastName, date) {
+  const datePart = date.replaceAll('-', '')
+  const namePart = `${capitalize(firstName)}${capitalize(lastName)}`
+  const purposePart = purpose.replaceAll(' ', '_')
+  return `${datePart}.${namePart}.${purposePart}.${index}.jpg`
+}
+
+function ImageCard({ src, index, onRemove }) {
+  const [ purpose, setPurpose ] = React.useState('')
+  const [ filename, setFilename ] = React.useState('')
+
+  const formState = React.useContext(FormContext)
+
+  React.useEffect(() => {
+    setFilename(getFilename(index + 1, purpose, formState.firstName, formState.lastName, formState.date))
+  }, [ formState.date, formState.firstName, formState.lastName, purpose ])
+
+  return <div className="card w-50 p-4 d-flex">
     <img src={src} />
-    <span>Image { index }</span>
+    <div className="d-flex row">
+      <label>
+        Purpose
+        <input name="purpose" autoComplete="on" type="text" value={purpose} onChange={(e) => setPurpose(e.target.value)} />
+      </label>
+      <span>Final filename: { filename } </span>
+      <a href="#" onClick={() => onRemove(index)}>Remove</a>
+    </div>
   </div>
 }
 
 function UploadInterface() {
-  const [ images, setImages ] = React.useState([])
+  const [ images, setImages ] = React.useState(JSON.parse(localStorage.getItem('images') ?? '[]'))
+
+  React.useEffect(() => {
+    if (images && images.length > 0) {
+      localStorage.setItem('images', JSON.stringify(images))
+    }
+  }, [images])
 
   const handleFiles = async (event) => {
     const files = event.target.files;
@@ -100,32 +162,40 @@ function UploadInterface() {
     setImages([ ...images, ...newImages ])
   }
 
+  const onRemove = React.useCallback((index) => {
+    const updated = [ ...images ]
+    updated.splice(index, 1)
+    setImages(updated)
+  }, [images])
+
+  const formState = React.useContext(FormContext)
+
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
     <header className="d-flex justify-content-between mb-4">
       <span>Upload photos</span>
-      <span onClick={() => logout()}>Logout</span>
+      <a href="#" onClick={() => logout()}>Logout</a>
     </header>
     <div>
       <form className="d-flex row" style={{ 'gap': '2rem'}}>
         <div id="core-inputs" className="d-flex justify-content-between gap-4">
           <label>
             <span>Date</span>
-            <input type="date" />
+            <input type="date" value={formState.date} onChange={(e) => formState.setDate(e.target.value)} />
           </label>
           <label>
             <span>First name</span>
-            <input type="text" />
+            <input type="text" autoComplete="off" value={formState.firstName} onChange={(e) => formState.setFirstName(e.target.value)} />
           </label>
           <label>
             <span>Last name</span>
-            <input type="text" />
+            <input type="text" autoComplete="off" value={formState.lastName} onChange={(e) => formState.setLastName(e.target.value)} />
           </label>
         </div>
         <div id="upload">
           <input type="file" accept="image/*" multiple onChange={handleFiles} />
         </div>
         <div id="image-previews" className="d-flex wrap gap-4">
-          { images.map((src, index) => <ImageCard key={index} index={index} src={src} />) }
+          { images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />) }
         </div>
         <div>
           <button>Save photos</button>
@@ -137,7 +207,9 @@ function UploadInterface() {
 
 function App() {
   return <AppAuthentication>
-    <UploadInterface />
+    <FormContextProvider>
+      <UploadInterface />
+    </FormContextProvider>
   </AppAuthentication>
 }
 
