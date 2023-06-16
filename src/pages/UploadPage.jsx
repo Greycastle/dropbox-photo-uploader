@@ -29,6 +29,9 @@ export default function UploadPage() {
     const files = event.target.files;
     const newImages = await Promise.all(Array.from(files).map(loadImage))
     setImages([ ...images, ...newImages ])
+
+    // reset to allow new images to be uploaded
+    event.target.value = null
   }
 
   const onRemove = useCallback((index) => {
