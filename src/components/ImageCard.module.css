@@ -1,0 +1,27 @@
+.image-card {
+  /* d-flex flex-row */
+  display: flex;
+  flex-direction: row;
+}
+
+.image-card:hover, .image-card:focus-within {
+  box-shadow: 0 0 0 0.25rem rgba(0, 0, 255, 0.25);
+}
+
+.image-card img {
+  max-width: 20rem;
+  object-fit: contain;
+  border-radius: var(--bs-card-border-radius);
+}
+
+
+@media (max-width: 767.98px) {
+  .image-card {
+    flex-direction: column-reverse;
+  }
+
+  .image-card img {
+    max-width: 100%;
+    margin: 0.5rem;
+  }
+}

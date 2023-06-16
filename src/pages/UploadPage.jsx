@@ -8,6 +8,8 @@ import { logout } from '@/state/auth'
 import LoginButton from '@/components/LoginButton'
 import ImageCard from '@/components/ImageCard'
 
+import styles from './UploadPage.module.css'
+
 async function loadImage(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -17,6 +19,10 @@ async function loadImage(file) {
 
     reader.readAsDataURL(file);
   })
+}
+
+function trimInput(input) {
+  return input.split(' ').map((part) => capitalize(part)).join('').trim();
 }
 
 export default function UploadPage() {
@@ -72,18 +78,18 @@ export default function UploadPage() {
     </header>
     { uploadState === 'pending' && <div>
       <form className="d-flex flex-column row-gap-4">
-        <div id="core-inputs" className="d-flex w-100 justify-content-between column-gap-4">
+        <div className={ styles['form-inputs'] }>
           <label className="flex-grow-1">
             <span>Date</span>
             <input className="w-100" type="date" value={formState.date} onChange={(e) => formState.setDate(e.target.value)} />
           </label>
           <label className="flex-grow-1">
             <span>First name</span>
-            <input className="w-100" type="text" autoComplete="off" value={formState.firstName} onChange={(e) => formState.setFirstName(e.target.value)} />
+            <input className="w-100" type="text" autoComplete="off" value={formState.firstName} onBlur={(e) => formState.setFirstName(trimInput(e.target.value))} onChange={(e) => formState.setFirstName(e.target.value)} />
           </label>
           <label className="flex-grow-1">
             <span>Last name</span>
-            <input className="w-100" type="text" autoComplete="off" value={formState.lastName} onChange={(e) => formState.setLastName(e.target.value)} />
+            <input className="w-100" type="text" autoComplete="off" value={formState.lastName} onBlur={(e) => formState.setLastName(trimInput(e.target.value))} onChange={(e) => formState.setLastName(e.target.value)} />
           </label>
         </div>
         <div className="file-upload p-4" onClick={(e) => fileButton.current.click(e)}>
@@ -94,7 +100,7 @@ export default function UploadPage() {
           { images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />) }
         </div>
         <div>
-          <button onClick={(e) => { e.preventDefault(); upload(); }}>Save photos</button>
+          <button className={styles['upload-button']} onClick={(e) => { e.preventDefault(); upload(); }}>Save photos</button>
         </div>
       </form>
     </div> }

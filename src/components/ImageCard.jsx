@@ -3,6 +3,8 @@ import { PropTypes } from 'prop-types'
 import FormContext from '@/state/form-context'
 import getFilename from '@/services/get-filename'
 
+import styles from './ImageCard.module.css'
+
 const nameLengthLimit = 120;
 
 export default function ImageCard({ src, index, onRemove }) {
@@ -21,8 +23,8 @@ export default function ImageCard({ src, index, onRemove }) {
 
   const lengthExceeded = filename.length > nameLengthLimit
 
-  return <div className="card w-100 p-1 d-flex flex-row">
-    <img src={src} style={{ maxWidth: '20rem', objectFit: 'contain', borderRadius: 'var(--bs-card-border-radius)' }} />
+  return <div className={ 'card w-100 p-1 ' + styles['image-card'] }>
+    <img src={src} />
     <div className="d-flex flex-column row-gap-2 flex-grow-1 mx-2" style={{ overflow: 'hidden' }}>
       <label className="w-100">
         Purpose
