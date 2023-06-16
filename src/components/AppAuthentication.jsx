@@ -26,8 +26,11 @@ export default function AppAuthentication({ children }) {
 
   return <div className="d-flex justify-content-center">
     <div className="mt-4 d-flex justify-content-center flex-column">
-      <h1 className="mb-4">Photo uploader</h1>
-      <LoginButton/>
+      <h1 className="mb-4">IxPhotoUploader</h1>
+      <img alt="Application logo" src="/logo.png" />
+      <div className="mt-4 d-flex justify-content-center flex-column">
+        <LoginButton />
+      </div>
     </div>
   </div>
 }
