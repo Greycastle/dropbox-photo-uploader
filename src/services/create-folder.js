@@ -1,9 +1,8 @@
 import { Dropbox } from 'dropbox'
-
-import { getToken } from '@/state/auth-token'
+import { getDropboxAuth } from '@/state/auth'
 
 export default async function createFolder(name) {
-  const client = new Dropbox({ accessToken: getToken() })
+  const client = new Dropbox({ auth: getDropboxAuth() })
   try {
     await client.filesCreateFolderV2({ path: '/' + name, autorename: false })
   } catch (err) {
@@ -11,7 +10,7 @@ export default async function createFolder(name) {
       console.log('Folder already exists')
       return
     }
-    console.log(`Failed to create folder ${err.error.error_summary}`)
-    throw new Error(`Failed to create folder ${err.error.error_summary}`)
+    console.log(`Failed to create folder ${err}`)
+    throw new Error(`Failed to create folder ${err}`)
   }
 }
