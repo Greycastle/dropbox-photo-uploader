@@ -3,6 +3,7 @@ import capitalize from '@/services/capitalize'
 import uploadFiles from '@/services/upload-files'
 import createFolder from '@/services/create-folder'
 import FormContext from '@/state/form-context'
+import { logout } from '@/state/auth'
 
 import LoginButton from '@/components/LoginButton'
 import ImageCard from '@/components/ImageCard'
@@ -16,11 +17,6 @@ async function loadImage(file) {
 
     reader.readAsDataURL(file);
   })
-}
-
-function logout() {
-  localStorage.removeItem('photo_uploader_token')
-  window.location = window.location.origin
 }
 
 export default function UploadPage() {

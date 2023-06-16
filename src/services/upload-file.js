@@ -1,5 +1,5 @@
 import { Dropbox } from 'dropbox'
-import { getToken } from '@/state/auth-token'
+import { getDropboxAuth } from '@/state/auth'
 
 async function convertDataUrlToOctetStream(dataUrl) {
   const response = await fetch(dataUrl);
@@ -10,10 +10,10 @@ export default async function uploadFile(path, dataUrl) {
   const data = await convertDataUrlToOctetStream(dataUrl)
 
   try {
-    const client = new Dropbox({ accessToken: getToken() })
+    const client = new Dropbox({ auth: getDropboxAuth() })
     await client.filesUpload({ path, contents: data, autorename: false })
   } catch (err) {
-    console.log(`Failed to upload file ${err.error.error_summary}`)
-    throw new Error(`Failed to upload file ${err.error.error_summary}`)
+    console.log(`Failed to upload file ${err}`)
+    throw new Error(`Failed to upload file ${err}`)
   }
 }
