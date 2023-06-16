@@ -10,7 +10,7 @@ It uses a Dropbox application to authenticate to your Dropbox account and simpli
 
 This application is running at:
 
-https://greycastle.github.io/dropbox-photo-uploader/
+https://dropbox-photo-uploader.vercel.app/
 
 ## Running locally
 
