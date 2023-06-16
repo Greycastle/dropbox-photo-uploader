@@ -5,7 +5,6 @@ import createFolder from '@/services/create-folder'
 import FormContext from '@/state/form-context'
 import { logout } from '@/state/auth'
 
-import LoginButton from '@/components/LoginButton'
 import ImageCard from '@/components/ImageCard'
 import FileInput from '@/components/FileInput'
 
@@ -38,13 +37,9 @@ export default function UploadPage() {
       formState.reset()
       setUploadState('success')
     } catch (err) {
-      if (err.message === 'Unauthorized') {
-        setUploadState('unauthorized')
-      } else {
-        setErrorInformation(err.toString())
-        setUploadState('failed')
-        console.error('Failed to upload', err);
-      }
+      setErrorInformation(err.toString())
+      setUploadState('failed')
+      console.error('Failed to upload', err);
     }
   }, [ formState, images ])
 
@@ -89,11 +84,8 @@ export default function UploadPage() {
     { uploadState === 'success' && <div>
       <p>Upload completed!</p>
       <button onClick={() => setUploadState('pending')}>Continue</button>
-      </div>}
-    { uploadState === 'unauthorized' && <div>
-      <p>Your login has expired. Please login again.</p>
-      <LoginButton />
-    </div> }
+    </div>
+    }
     { uploadState === 'failed' && <div className="d-flex flex-column align-items-start">
         <p>The upload failed and we cannot say for sure why. Please send this information to the developer or admin:</p>
         <div className="mb-4">
