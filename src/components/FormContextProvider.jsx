@@ -33,8 +33,8 @@ export default function FormContextProvider({ children }) {
     firstName,
     lastName,
     setDate,
-    setFirstName,
-    setLastName,
+    setFirstName: setFirstName,
+    setLastName: setLastName,
     imagePurpose,
     setImagePurpose,
     reset

@@ -1,0 +1,18 @@
+.form-inputs {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  column-gap: 1rem;
+}
+
+@media (max-width: 767.98px) {
+  .form-inputs {
+    flex-direction: column;
+    justify-content: stretch;
+    row-gap: 1rem;
+  }
+
+  .upload-button {
+    width: 100%;
+  }
+}
