@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useContext } from 'react'
+import { useState, useCallback, useContext } from 'react'
 import capitalize from '@/services/capitalize'
 import uploadFiles from '@/services/upload-files'
 import createFolder from '@/services/create-folder'
@@ -7,19 +7,9 @@ import { logout } from '@/state/auth'
 
 import LoginButton from '@/components/LoginButton'
 import ImageCard from '@/components/ImageCard'
+import FileInput from '@/components/FileInput'
 
 import styles from './UploadPage.module.css'
-
-async function loadImage(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      resolve(reader.result)
-    };
-
-    reader.readAsDataURL(file);
-  })
-}
 
 function trimInput(input) {
   return input.split(' ').map((part) => capitalize(part)).join('').trim();
@@ -29,16 +19,6 @@ export default function UploadPage() {
   const [ images, setImages ] = useState([])
   const [ uploadState, setUploadState ] = useState('pending')
   const [ errorInformation, setErrorInformation ] = useState(null)
-  const fileButton = useRef(null)
-
-  const handleFiles = async (event) => {
-    const files = event.target.files;
-    const newImages = await Promise.all(Array.from(files).map(loadImage))
-    setImages([ ...images, ...newImages ])
-
-    // reset to allow new images to be uploaded
-    event.target.value = null
-  }
 
   const onRemove = useCallback((index) => {
     const updated = [ ...images ]
@@ -68,6 +48,10 @@ export default function UploadPage() {
     }
   }, [ formState, images ])
 
+  const addImages = useCallback((newImages) => {
+    setImages([ ...images, ...newImages ])
+  }, [ images ])
+
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
     <header className="d-flex justify-content-between mb-4">
       <span className="title">Photo uploader</span>
@@ -92,10 +76,7 @@ export default function UploadPage() {
             <input className="w-100" type="text" autoComplete="off" value={formState.lastName} onBlur={(e) => formState.setLastName(trimInput(e.target.value))} onChange={(e) => formState.setLastName(e.target.value)} />
           </label>
         </div>
-        <div className="file-upload p-4" onClick={(e) => fileButton.current.click(e)}>
-          <span>Click to select files</span>
-          <input ref={fileButton} id="file-upload" type="file" accept="image/*" multiple onChange={handleFiles} />
-        </div>
+        <FileInput onImagesAdded={addImages} />
         <div id="image-previews" className="d-flex flex-column row-gap-4">
           { images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />) }
         </div>
