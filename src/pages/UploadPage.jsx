@@ -54,7 +54,7 @@ export default function UploadPage() {
 
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
     <header className="d-flex justify-content-between mb-4">
-      <span className="title">Photo uploader</span>
+      <span className="title">IxPhotoUploader</span>
       <div className="d-flex flex-row column-gap-4">
         <a href="#" onClick={() => formState.reset()}>Reset form</a>
         <a href="#" onClick={() => logout()}>Logout</a>
@@ -94,9 +94,12 @@ export default function UploadPage() {
       <p>Your login has expired. Please login again.</p>
       <LoginButton />
     </div> }
-    { uploadState === 'failed' && <div>
+    { uploadState === 'failed' && <div className="d-flex flex-column align-items-start">
         <p>The upload failed and we cannot say for sure why. Please send this information to the developer or admin:</p>
-        <code>{ errorInformation }</code>
+        <div className="mb-4">
+          <code>{ errorInformation }</code>
+        </div>
+        <button onClick={() => setUploadState('pending')}>Try again</button>
       </div> }
   </div>
 }

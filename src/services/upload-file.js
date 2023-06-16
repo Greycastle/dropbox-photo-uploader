@@ -13,6 +13,9 @@ export default async function uploadFile(path, dataUrl) {
     const client = new Dropbox({ auth: getDropboxAuth() })
     await client.filesUpload({ path, contents: data, autorename: false })
   } catch (err) {
+    if (err.status === 409) {
+      throw new Error(`File already exists at path ${path}`)
+    }
     console.log(`Failed to upload file ${err}`)
     throw new Error(`Failed to upload file ${err}`)
   }
