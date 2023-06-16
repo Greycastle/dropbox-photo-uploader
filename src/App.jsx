@@ -1,8 +1,11 @@
+import { useState, useCallback, useEffect, createContext, useContext, useRef } from 'react'
+import { PropTypes } from 'prop-types'
+
 const rawRedirectUri = window.location.origin + window.location.pathname + '?authenticated=true';
 
 const nameLengthLimit = 120;
 
-const FormContext = React.createContext({})
+const FormContext = createContext({})
 
 function getTodaysDate() {
   var local = new Date();
@@ -10,14 +13,13 @@ function getTodaysDate() {
   return local.toJSON().slice(0,10);
 }
 
-const today = new Date().toDat
 function FormContextProvider({ children }) {
-  const [ date, setDate ] = React.useState(localStorage.getItem('form_date') ?? getTodaysDate())
-  const [ firstName, setFirstName ] = React.useState(localStorage.getItem('form_firstName') ?? '')
-  const [ lastName, setLastName ] = React.useState(localStorage.getItem('form_lastName') ?? '')
-  const [ imagePurpose, setImagePurpose ] = React.useState({})
+  const [ date, setDate ] = useState(localStorage.getItem('form_date') ?? getTodaysDate())
+  const [ firstName, setFirstName ] = useState(localStorage.getItem('form_firstName') ?? '')
+  const [ lastName, setLastName ] = useState(localStorage.getItem('form_lastName') ?? '')
+  const [ imagePurpose, setImagePurpose ] = useState({})
 
-  React.useEffect(() => {
+  useEffect(() => {
     localStorage.setItem('form_date', date)
     localStorage.setItem('form_firstName', firstName)
     localStorage.setItem('form_lastName', lastName)
@@ -45,6 +47,10 @@ function FormContextProvider({ children }) {
   return <FormContext.Provider value={state}>
     { children }
   </FormContext.Provider>
+}
+
+FormContextProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 }
 
 async function getClientToken(code) {
@@ -84,10 +90,10 @@ function getToken() {
 }
 
 function AppAuthentication({ children }) {
-  const [ isAuthenticated, setAuthenticated ] = React.useState(getToken() !== null)
-  const [ isLoading, setIsLoading ] = React.useState(true)
+  const [ isAuthenticated, setAuthenticated ] = useState(getToken() !== null)
+  const [ isLoading, setIsLoading ] = useState(true)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated) {
       handleAuthentication().then((token) => setAuthenticated(token !== null)).finally(() => setIsLoading(false))
     } else {
@@ -109,6 +115,10 @@ function AppAuthentication({ children }) {
       <LoginButton/>
     </div>
   </div>
+}
+
+AppAuthentication.propTypes = {
+  children: PropTypes.node.isRequired,
 }
 
 function LoginButton() {
@@ -151,16 +161,16 @@ function getFilename(index, purpose, firstName, lastName, date) {
 }
 
 function ImageCard({ src, index, onRemove }) {
-  const [ filename, setFilename ] = React.useState('')
+  const [ filename, setFilename ] = useState('')
 
-  const formState = React.useContext(FormContext)
+  const formState = useContext(FormContext)
 
-  React.useEffect(() => {
+  useEffect(() => {
     const purpose = formState.imagePurpose[index] ?? ''
     setFilename(getFilename(index + 1, purpose, formState.firstName, formState.lastName, formState.date))
   }, [ formState ])
 
-  const setPurpose = React.useCallback((purpose) => {
+  const setPurpose = useCallback((purpose) => {
     formState.setImagePurpose({ ...formState.imagePurpose, [index]: purpose })
   }, [ index, formState.imagePurpose ])
 
@@ -181,6 +191,12 @@ function ImageCard({ src, index, onRemove }) {
       <a className="mt-4" href="#" onClick={() => onRemove(index)}>Remove</a>
     </div>
   </div>
+}
+
+ImageCard.propTypes = {
+  src: PropTypes.string.isRequired,
+  index: PropTypes.number.isRequired,
+  onRemove: PropTypes.func.isRequired,
 }
 
 async function createFolder(name) {
@@ -259,10 +275,10 @@ async function uploadFiles(folderName, images, formState) {
 }
 
 function UploadInterface() {
-  const [ images, setImages ] = React.useState([])
-  const [ uploadState, setUploadState ] = React.useState('pending')
-  const [ errorInformation, setErrorInformation ] = React.useState(null)
-  const fileButton = React.useRef(null)
+  const [ images, setImages ] = useState([])
+  const [ uploadState, setUploadState ] = useState('pending')
+  const [ errorInformation, setErrorInformation ] = useState(null)
+  const fileButton = useRef(null)
 
   const handleFiles = async (event) => {
     const files = event.target.files;
@@ -270,15 +286,15 @@ function UploadInterface() {
     setImages([ ...images, ...newImages ])
   }
 
-  const onRemove = React.useCallback((index) => {
+  const onRemove = useCallback((index) => {
     const updated = [ ...images ]
     updated.splice(index, 1)
     setImages(updated)
   }, [images])
 
-  const formState = React.useContext(FormContext)
+  const formState = useContext(FormContext)
 
-  const upload = React.useCallback(async () => {
+  const upload = useCallback(async () => {
     setUploadState('uploading')
     try {
       const folderName = `${capitalize(formState.firstName)}${capitalize(formState.lastName)}`
@@ -350,15 +366,10 @@ function UploadInterface() {
   </div>
 }
 
-function App() {
+export default function App() {
   return <AppAuthentication>
     <FormContextProvider>
       <UploadInterface />
     </FormContextProvider>
   </AppAuthentication>
 }
-
-ReactDOM.render(
-  <App />,
-  document.getElementById('root')
-);
