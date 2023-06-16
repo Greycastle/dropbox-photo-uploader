@@ -103,19 +103,24 @@ function AppAuthentication({ children }) {
     return children
   }
 
+  return <div className="d-flex justify-content-center">
+    <div className="mt-4 d-flex justify-content-center flex-column">
+      <h1 className="mb-4">Photo uploader</h1>
+      <LoginButton/>
+    </div>
+  </div>
+}
+
+function LoginButton() {
   const connect = () => {
+    localStorage.removeItem('photo_uploader_token')
     const redirectUri = encodeURIComponent(rawRedirectUri);
     const clientId = '4l2igbdm2itulbo';
     const url = `https://www.dropbox.com/oauth2/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
     window.location = url;
   }
 
-  return <div className="d-flex justify-content-center">
-    <div className="mt-4 d-flex justify-content-center flex-column">
-      <h1 className="mb-4">Photo uploader</h1>
-      <button onClick={() => connect()}>Connect DropBox</button>
-    </div>
-  </div>
+  return <button onClick={() => connect()}>Connect DropBox</button>
 }
 
 function logout() {
@@ -200,8 +205,13 @@ async function createFolder(name) {
     return
   }
 
+  if (response.status === 401) {
+    throw new Error('Unauthorized')
+  }
+
   const data = await response.json()
   console.log(`Failed to create folder ${response.status}`, data)
+  throw new Error(`Failed to create folder ${response.status}`)
 }
 
 async function convertDataUrlToOctetStream(dataUrl) {
@@ -228,8 +238,12 @@ async function uploadFile(path, dataUrl) {
     console.log('File already exists: ' + path)
     return
   }
+  if (response.status === 401) {
+    throw new Error('Unauthorized')
+  }
   const responseJson = await response.json()
   console.error(`Failed to upload: ${path}`, responseJson)
+  throw new Error(`Failed to upload: ${path}`);
 }
 
 async function uploadFiles(folderName, images, formState) {
@@ -247,6 +261,7 @@ async function uploadFiles(folderName, images, formState) {
 function UploadInterface() {
   const [ images, setImages ] = React.useState([])
   const [ uploadState, setUploadState ] = React.useState('pending')
+  const [ errorInformation, setErrorInformation ] = React.useState(null)
   const fileButton = React.useRef(null)
 
   const handleFiles = async (event) => {
@@ -265,12 +280,22 @@ function UploadInterface() {
 
   const upload = React.useCallback(async () => {
     setUploadState('uploading')
-    const folderName = `${capitalize(formState.firstName)}${capitalize(formState.lastName)}`
-    await createFolder(folderName)
-    await uploadFiles(folderName, images, formState)
-    setImages([])
-    formState.reset()
-    setUploadState('success')
+    try {
+      const folderName = `${capitalize(formState.firstName)}${capitalize(formState.lastName)}`
+      await createFolder(folderName)
+      await uploadFiles(folderName, images, formState)
+      setImages([])
+      formState.reset()
+      setUploadState('success')
+    } catch (err) {
+      if (err.message === 'Unauthorized') {
+        setUploadState('unauthorized')
+      } else {
+        setErrorInformation(err.toString())
+        setUploadState('failed')
+        console.error('Failed to upload', err);
+      }
+    }
   }, [ formState, images ])
 
   return <div className="w-100" style={ { 'maxWidth': '920px' } }>
@@ -314,6 +339,14 @@ function UploadInterface() {
       <p>Upload completed!</p>
       <button onClick={() => setUploadState('pending')}>Continue</button>
       </div>}
+    { uploadState === 'unauthorized' && <div>
+      <p>Your login has expired. Please login again.</p>
+      <LoginButton />
+    </div> }
+    { uploadState === 'failed' && <div>
+        <p>The upload failed and we cannot say for sure why. Please send this information to the developer or admin:</p>
+        <code>{ errorInformation }</code>
+      </div> }
   </div>
 }
 
