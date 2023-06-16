@@ -22,16 +22,6 @@ input {
   padding: 0.25rem;
 }
 
-.file-upload input[type="file"] {
-  display: none;
-}
-
-.file-upload {
-  border: 1px solid gray;
-  background-color: lightgray;
-  border-radius: var(--bs-border-radius);
-}
-
 button {
   border: 1px solid #007bff;
   border-radius: 0.5rem;
@@ -44,10 +34,6 @@ button {
 button:hover {
   background-color: white;
   color: #007bff;
-}
-
-.file-upload, .file-upload * {
-  cursor: pointer;
 }
 
 .text-danger {

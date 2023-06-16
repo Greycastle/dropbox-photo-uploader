@@ -1,0 +1,25 @@
+.file-drop-area input[type="file"] {
+  display: none;
+}
+
+.file-drop-area {
+  border-width: 1px;
+  border-color: #eeeeee;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  border-style: dashed;
+  border-radius: 0.2rem;
+  padding: 4rem;
+  text-align: center;
+
+  transition: .1s ease-in-out;
+}
+
+.file-drop-area.is-active {
+  border-color: #007bff;
+  color: #282828;
+}
+
+.file-drop-area:hover {
+  cursor: pointer;
+}
