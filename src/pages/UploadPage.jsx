@@ -1,4 +1,4 @@
-import { useState, useCallback, useContext } from 'react'
+import { useState, useCallback, useContext, useMemo } from 'react'
 import capitalize from '@/services/capitalize'
 import uploadFiles from '@/services/upload-files'
 import createFolder from '@/services/create-folder'
@@ -26,6 +26,13 @@ export default function UploadPage() {
   }, [images])
 
   const formState = useContext(FormContext)
+
+  const isFormReady = useMemo(() => {
+    const isSet = (txt) => txt && txt.length > 0;
+    const mainFieldsFilled = formState.date && isSet(formState.firstName) && isSet(formState.lastName)
+    const allImagesHavePurpose = images.length > 0 && images.every((_, index) => isSet(formState.imagePurpose[index]))
+    return mainFieldsFilled && allImagesHavePurpose
+  }, [ formState, images ])
 
   const upload = useCallback(async () => {
     setUploadState('uploading')
@@ -75,8 +82,9 @@ export default function UploadPage() {
         <div id="image-previews" className="d-flex flex-column row-gap-4">
           { images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />) }
         </div>
-        <div>
-          <button className={styles['upload-button']} onClick={(e) => { e.preventDefault(); upload(); }}>Save photos</button>
+        <div className="d-flex flex-column gap-2 align-items-start">
+          <button disabled={!isFormReady} className={styles['upload-button']} onClick={(e) => { e.preventDefault(); upload(); }}>Save photos</button>
+          { isFormReady == false && <span className='text-danger'>* Please enter all fields before upload</span> }
         </div>
       </form>
     </div> }
