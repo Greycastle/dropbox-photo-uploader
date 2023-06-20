@@ -1,16 +1,15 @@
 import { useState, useCallback, useContext, useMemo } from 'react'
 import capitalize from '@/services/capitalize'
-// import uploadFiles from '@/services/upload-files'
-// import createFolder from '@/services/create-folder'
 import startUpload from '@/services/start-upload'
 import FormContext from '@/state/form-context'
-import { logout } from '@/state/auth'
 
 import ImageCard from '@/components/ImageCard'
 import FileInput from '@/components/FileInput'
 import UploadProgress from '@/components/UploadProgress'
+import PageLayout from '@/components/PageLayout'
 
 import styles from './UploadPage.module.css'
+import { getUploadFolder } from '../state/upload-folder'
 
 function trimInput(input) {
   return input.split(' ').map((part) => capitalize(part)).join('').trim();
@@ -21,6 +20,7 @@ export default function UploadPage() {
   const [uploadState, setUploadState] = useState('pending')
   const [errorInformation, setErrorInformation] = useState(null)
   const [uploadTasks, setUploadTasks] = useState([])
+  const uploadFolder = getUploadFolder()
 
   const onRemove = useCallback((index) => {
     const updated = [...images]
@@ -41,7 +41,7 @@ export default function UploadPage() {
     setUploadTasks([])
     setUploadState('uploading')
     try {
-      const tasks = await startUpload(images, formState)
+      const tasks = await startUpload(images, formState, uploadFolder)
       setUploadTasks(tasks)
       await Promise.all(tasks.map((task) => task.promise))
       setUploadState('success')
@@ -58,14 +58,15 @@ export default function UploadPage() {
     setImages([...images, ...newImages])
   }, [images])
 
-  return <div className="w-100" style={{ 'maxWidth': '920px' }}>
-    <header className="d-flex justify-content-between mb-4">
-      <span className="title">IxPhotoUploader</span>
-      <div className="d-flex flex-row column-gap-4">
-        <a href="#" onClick={() => formState.reset()}>Reset form</a>
-        <a href="#" onClick={() => logout()}>Logout</a>
-      </div>
-    </header>
+
+  if (!uploadFolder) {
+    location.hash = '#folder-selection'
+    return
+  }
+
+  const folderLink = <a href="#folder-selection">Set folder</a>
+
+  return <PageLayout headerItems={folderLink}>
     {uploadState === 'pending' && <div>
       <form className="d-flex flex-column row-gap-4">
         <div className={styles['form-inputs']}>
@@ -109,5 +110,5 @@ export default function UploadPage() {
       </div>
       <button onClick={() => setUploadState('pending')}>Try again</button>
     </div>}
-  </div>
+  </PageLayout>
 }
