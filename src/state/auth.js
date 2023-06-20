@@ -61,8 +61,9 @@ export function isLoggedIn() {
 
 export function logout() {
   localStorage.removeItem(ACCESS_TOKEN_KEY);
-  auth.setAccessToken(null);
-  window.location = window.location.origin
+  auth.setAccessToken(undefined);
+  window.location.replace(window.location.origin)
+  return false
 }
 
 export function getDropboxAuth() {

@@ -9,7 +9,7 @@ export default function PageLayout({ children, headerItems }) {
       <span className="title">IxPhotoUploader</span>
       <div className="d-flex flex-row column-gap-4">
         { headerItems !== undefined && headerItems }
-        <a href="#" onClick={() => logout()}>Logout</a>
+        <span className="link" onClick={logout}>Logout</span>
       </div>
     </header>
     <div>

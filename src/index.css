@@ -50,6 +50,17 @@ button:disabled {
   cursor: not-allowed;
 }
 
+a, .link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+a:hover, .link:hover {
+  text-decoration: underline;
+  color: #003b79;
+  cursor: pointer;
+}
+
 .text-danger {
   font-size: 0.75rem;
   color: red;
