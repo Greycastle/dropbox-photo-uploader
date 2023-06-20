@@ -3,7 +3,7 @@ import { DropboxAuth } from "dropbox";
 const redirectUri = window.location.origin + window.location.pathname + '?authenticated=true';
 
 const auth = new DropboxAuth({
-  clientId: "4l2igbdm2itulbo",
+  clientId: import.meta.env.VITE_DROPBOX_CLIENT_ID,
   accessToken: localStorage.getItem('token'),
   refreshToken: localStorage.getItem('refresh_token'),
   accessTokenExpiresAt: new Date(Date.now() - 1000),
