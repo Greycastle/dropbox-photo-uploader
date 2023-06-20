@@ -85,7 +85,7 @@ export default function UploadPage() {
         </div>
         <FileInput onImagesAdded={addImages} />
         <div id="image-previews" className="d-flex flex-column row-gap-4">
-          {images.map((src, index) => <ImageCard key={index} index={index} src={src} onRemove={onRemove} />)}
+          {images.map((image, index) => <ImageCard key={index} index={index} image={image} onRemove={onRemove} />)}
         </div>
         <div className="d-flex flex-column gap-2 align-items-start">
           <button disabled={!isFormReady} className={styles['upload-button']} onClick={(e) => { e.preventDefault(); upload(); }}>Save photos</button>

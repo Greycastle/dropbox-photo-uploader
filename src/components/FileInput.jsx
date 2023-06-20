@@ -8,7 +8,7 @@ async function loadImage(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.onload = () => {
-      resolve(reader.result)
+      resolve({ data: reader.result, filename: file.name })
     };
 
     reader.readAsDataURL(file);
