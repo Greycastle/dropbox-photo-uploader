@@ -2,17 +2,21 @@ import { DropboxAuth } from "dropbox";
 
 const redirectUri = window.location.origin + window.location.pathname + '?authenticated=true';
 
+const ACCESS_TOKEN_KEY = 'dropbox-photo-upload::token'
+const REFRESH_TOKEN_KEY = 'dropbox-photo-upload::refresh_token'
+const CODE_VERIFIER_KEY = 'dropbox-photo-upload::code_verifier'
+
 const auth = new DropboxAuth({
   clientId: import.meta.env.VITE_DROPBOX_CLIENT_ID,
-  accessToken: localStorage.getItem('token'),
-  refreshToken: localStorage.getItem('refresh_token'),
+  accessToken: localStorage.getItem(ACCESS_TOKEN_KEY),
+  refreshToken: localStorage.getItem(REFRESH_TOKEN_KEY),
   accessTokenExpiresAt: new Date(Date.now() - 1000),
 });
 
 export async function login() {
   const authUrl = await auth.getAuthenticationUrl(redirectUri, null, 'code', 'offline', undefined, 'user', true);
-  localStorage.removeItem('token');
-  localStorage.setItem('code_verifier', auth.getCodeVerifier());
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.setItem(CODE_VERIFIER_KEY, auth.getCodeVerifier());
   location.href = authUrl;
 }
 
@@ -37,13 +41,13 @@ export async function handleLoginRedirect() {
     return isLoggedIn()
   }
 
-  auth.setCodeVerifier(localStorage.getItem('code_verifier'));
+  auth.setCodeVerifier(localStorage.getItem(CODE_VERIFIER_KEY));
   const authResult = await auth.getAccessTokenFromCode(redirectUri, getCodeFromUrl());
   auth.setAccessToken(authResult.result.access_token);
   auth.setAccessTokenExpiresAt(getTokenExpiresAtDate(authResult.result.expires_in));
   auth.setRefreshToken(authResult.result.refresh_token);
-  localStorage.setItem('token', authResult.result.access_token);
-  localStorage.setItem('refresh_token', authResult.result.refresh_token);
+  localStorage.setItem(ACCESS_TOKEN_KEY, authResult.result.access_token);
+  localStorage.setItem(REFRESH_TOKEN_KEY, authResult.result.refresh_token);
 
   // clean the current url from login query params
   window.history.replaceState({}, document.title, window.location.pathname)
@@ -56,7 +60,7 @@ export function isLoggedIn() {
 }
 
 export function logout() {
-  localStorage.removeItem('token');
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
   auth.setAccessToken(null);
   window.location = window.location.origin
 }

@@ -10,15 +10,15 @@ function getTodaysDate() {
 }
 
 export default function FormContextProvider({ children }) {
-  const [ date, setDate ] = useState(localStorage.getItem('form_date') ?? getTodaysDate())
-  const [ firstName, setFirstName ] = useState(localStorage.getItem('form_firstName') ?? '')
-  const [ lastName, setLastName ] = useState(localStorage.getItem('form_lastName') ?? '')
+  const [ date, setDate ] = useState(sessionStorage.getItem('form_date') ?? getTodaysDate())
+  const [ firstName, setFirstName ] = useState(sessionStorage.getItem('form_firstName') ?? '')
+  const [ lastName, setLastName ] = useState(sessionStorage.getItem('form_lastName') ?? '')
   const [ imagePurpose, setImagePurpose ] = useState({})
 
   useEffect(() => {
-    localStorage.setItem('form_date', date)
-    localStorage.setItem('form_firstName', firstName)
-    localStorage.setItem('form_lastName', lastName)
+    sessionStorage.setItem('form_date', date)
+    sessionStorage.setItem('form_firstName', firstName)
+    sessionStorage.setItem('form_lastName', lastName)
   }, [ date, firstName, lastName ])
 
   const reset = () => {

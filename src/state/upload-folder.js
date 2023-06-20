@@ -1,9 +1,9 @@
-const key = 'selected-folder';
+const SELECTED_FOLDER_KEY = 'dropbox-photo-upload::selected-folder';
 
 export function getUploadFolder() {
-  return localStorage.getItem(key) || null
+  return localStorage.getItem(SELECTED_FOLDER_KEY) || null
 }
 
 export function setUploadFolder(folder) {
-  localStorage.setItem(key, folder);
+  localStorage.setItem(SELECTED_FOLDER_KEY, folder);
 }
