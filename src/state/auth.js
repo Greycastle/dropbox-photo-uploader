@@ -14,7 +14,7 @@ const auth = new DropboxAuth({
 });
 
 export async function login() {
-  const authUrl = await auth.getAuthenticationUrl(redirectUri, null, 'code', 'offline', undefined, 'user', true);
+  const authUrl = await auth.getAuthenticationUrl(redirectUri, null, 'code', 'offline', undefined, 'team', true);
   localStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.setItem(CODE_VERIFIER_KEY, auth.getCodeVerifier());
   location.href = authUrl;
@@ -60,7 +60,7 @@ export function isLoggedIn() {
 }
 
 export function logout() {
-  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.clear();
   auth.setAccessToken(undefined);
   window.location.replace(window.location.origin)
   return false
