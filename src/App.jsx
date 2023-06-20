@@ -13,7 +13,6 @@ export default function App() {
     setPageRoute(window.location.hash)
   })
 
-  console.log(`pageRoute`, pageRoute)
   let page = <UploadPage />
   if (pageRoute === '#folder-selection') {
     page = <FolderSelection />
