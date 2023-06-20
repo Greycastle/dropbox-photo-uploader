@@ -52,7 +52,7 @@ export default function UploadPage() {
       setUploadState('failed')
       console.error('Failed to upload', err);
     }
-  }, [formState, images])
+  }, [formState, images, uploadFolder])
 
   const addImages = useCallback((newImages) => {
     setImages([...images, ...newImages])
