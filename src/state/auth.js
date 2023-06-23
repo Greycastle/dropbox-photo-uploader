@@ -43,7 +43,6 @@ export async function handleLoginRedirect() {
 
   auth.setCodeVerifier(localStorage.getItem(CODE_VERIFIER_KEY));
   const authResult = await auth.getAccessTokenFromCode(redirectUri, getCodeFromUrl());
-  console.log('authResult', authResult)
   auth.setAccessToken(authResult.result.access_token);
   auth.setAccessTokenExpiresAt(getTokenExpiresAtDate(authResult.result.expires_in));
   auth.setRefreshToken(authResult.result.refresh_token);
