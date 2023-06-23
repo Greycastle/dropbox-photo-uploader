@@ -1,5 +1,6 @@
 import { Dropbox } from 'dropbox'
 import { getDropboxAuth } from '@/state/auth'
+import { getPathRoot } from './get-path-root';
 
 async function convertDataUrlToOctetStream(dataUrl) {
   const response = await fetch(dataUrl);
@@ -10,7 +11,8 @@ export default async function uploadFile(path, dataUrl) {
   const data = await convertDataUrlToOctetStream(dataUrl)
 
   try {
-    const client = new Dropbox({ auth: getDropboxAuth() })
+    const pathRoot = await getPathRoot()
+    const client = new Dropbox({ auth: getDropboxAuth(), pathRoot })
     await client.filesUpload({ path, contents: data, autorename: false })
   } catch (err) {
     if (err.status === 409) {

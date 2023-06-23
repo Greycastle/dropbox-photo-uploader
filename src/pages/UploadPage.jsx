@@ -64,11 +64,12 @@ export default function UploadPage() {
     return
   }
 
-  const folderLink = <a href="#folder-selection">Set folder</a>
-
-  return <PageLayout headerItems={folderLink}>
+  return <PageLayout>
     {uploadState === 'pending' && <div>
       <form className="d-flex flex-column row-gap-4">
+        <div>
+          <span style={{marginRight: '1rem'}}>Upload folder:</span><span><span style={{ marginRight: '0.5rem'}}>{ uploadFolder }</span>(<a href="#folder-selection">change</a>)</span>
+        </div>
         <div className={styles['form-inputs']}>
           <label className="flex-grow-1">
             <span>Date</span>

@@ -1,12 +1,15 @@
 import { Dropbox } from 'dropbox'
 import { getDropboxAuth } from '@/state/auth'
+import { getPathRoot } from './get-path-root'
 
-export default async function createFolder(name) {
-  const client = new Dropbox({ auth: getDropboxAuth() })
+export default async function createFolder(path) {
+  const pathRoot = await getPathRoot()
+  const client = new Dropbox({ auth: getDropboxAuth(), pathRoot })
+
   try {
-    await client.filesCreateFolderV2({ path: '/' + name, autorename: false })
+    await client.filesCreateFolderV2({ path: path, autorename: false })
   } catch (err) {
-    if (err.error.error_summary.includes('path/conflict/folder')) {
+    if (err?.error?.error_summary?.includes('path/conflict/folder')) {
       console.log('Folder already exists')
       return
     }
